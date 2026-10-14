@@ -21,5 +21,4 @@ public class UserService {
                 .map(UserResponseDTO::new)
                 .collect(Collectors.toList());
     }
-
 }

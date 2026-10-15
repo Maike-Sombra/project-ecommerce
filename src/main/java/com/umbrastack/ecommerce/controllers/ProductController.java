@@ -1,11 +1,13 @@
 package com.umbrastack.ecommerce.controllers;
 
 
+import com.umbrastack.ecommerce.domain.Product;
 import com.umbrastack.ecommerce.dto.ProductResponseDTO;
 import com.umbrastack.ecommerce.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +23,10 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponseDTO>> findAll(){
         return ResponseEntity.ok(productService.findAll());
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ProductResponseDTO> findById(@PathVariable Long id){
+        return ResponseEntity.ok(productService.findById(id));
     }
 }

@@ -21,4 +21,10 @@ public class UserService {
                 .map(UserResponseDTO::new)
                 .collect(Collectors.toList());
     }
+
+    public UserResponseDTO findById(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: "+ id));
+        return new UserResponseDTO(user);
+    }
 }

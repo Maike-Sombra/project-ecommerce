@@ -12,7 +12,6 @@ import java.util.Objects;
 @Table(name = "tb_user")
 @Getter @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 
 public class User implements Serializable {
@@ -28,6 +27,14 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "client")
     private List<Order> orders = new ArrayList<>();
 
+    // Construtor sem a coleção de pedidos, mantendo a regra de segurança
+    public User(Long id, String name, String email, String phone, String password) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+    }
 
 
 }

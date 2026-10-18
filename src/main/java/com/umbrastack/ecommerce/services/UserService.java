@@ -4,6 +4,7 @@ package com.umbrastack.ecommerce.services;
 import com.umbrastack.ecommerce.domain.User;
 import com.umbrastack.ecommerce.dto.UserResponseDTO;
 import com.umbrastack.ecommerce.repositories.UserRepository;
+import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class UserService {
 
     public UserResponseDTO findById(Long id){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: "+ id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
         return new UserResponseDTO(user);
     }
 }

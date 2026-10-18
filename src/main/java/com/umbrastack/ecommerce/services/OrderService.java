@@ -4,6 +4,7 @@ package com.umbrastack.ecommerce.services;
 import com.umbrastack.ecommerce.domain.Order;
 import com.umbrastack.ecommerce.dto.OrderResponseDTO;
 import com.umbrastack.ecommerce.repositories.OrderRepository;
+import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class OrderService {
 
     public OrderResponseDTO findById(Long id){
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado com o ID: "+id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
         return new OrderResponseDTO(order);
     }
 }

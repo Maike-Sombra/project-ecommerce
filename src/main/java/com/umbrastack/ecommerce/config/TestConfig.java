@@ -25,6 +25,10 @@ public class TestConfig implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception{
 
+        if (userRepository.count()>0){
+            return;
+        }
+
         Category cat1 = new Category(null, "Electronics",null);
         Category cat2 = new Category(null, "Books", null);
         Category cat3 = new Category(null, "Computers", null);

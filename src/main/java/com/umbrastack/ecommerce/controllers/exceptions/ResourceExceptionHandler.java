@@ -2,6 +2,7 @@ package com.umbrastack.ecommerce.controllers.exceptions;
 
 import com.umbrastack.ecommerce.services.exceptions.DatabaseException;
 import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -33,10 +34,12 @@ public class ResourceExceptionHandler {
         return problemDetail;
     }
     // erro de banco de dados (delete)
-    @ExceptionHandler(DatabaseException.class)
-    public ProblemDetail handleDatabaseException(DatabaseException e, WebRequest request){
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException e, WebRequest request){
         HttpStatus status = HttpStatus.CONFLICT; //409 conflict
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, e.getMessage());
+
+        String message = "Falha de Integridade referencial: Não é possível deletar um usuário que possui pedidos associados.";
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, message);
 
         problemDetail.setTitle("Database Integrity Violation");
         problemDetail.setType(URI.create("https://umbrastack.com/errors/database-conflict"));
@@ -66,5 +69,25 @@ public class ResourceExceptionHandler {
 
         return problemDetail;
     }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleGeneralException(Exception e, WebRequest request) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // Status 500
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                status,
+                "Ocorreu um erro interno inesperado no servidor. Por favor, tente novamente mais tarde."
+        );
+
+        problemDetail.setTitle("Internal Server Error");
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+        
+        // IMPORTANTE: Faça o log do erro real no terminal/arquivo para você conseguir debugar depois!
+        // logger.error("Erro não esperado: ", e);
+
+        return problemDetail;
+    }
+
 
 }

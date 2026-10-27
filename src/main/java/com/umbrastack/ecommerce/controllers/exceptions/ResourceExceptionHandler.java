@@ -38,7 +38,7 @@ public class ResourceExceptionHandler {
     public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException e, WebRequest request){
         HttpStatus status = HttpStatus.CONFLICT; //409 conflict
 
-        String message = "Falha de Integridade referencial: Não é possível deletar um usuário que possui pedidos associados.";
+        String message = "Não é possível realizar esta operação pois o registro possui dados vinculados em outras partes do sistema.";
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, message);
 
         problemDetail.setTitle("Database Integrity Violation");

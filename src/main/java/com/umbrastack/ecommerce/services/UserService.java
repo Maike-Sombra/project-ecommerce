@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public List<UserResponseDTO> findAll(){
-        List<User> users = userRepository.findAllByOrderByIdAsc();
+        List<User> users = userRepository.findAll(Sort.by("id"));
         return users.stream()
                 .map(UserResponseDTO::new)
                 .collect(Collectors.toList());

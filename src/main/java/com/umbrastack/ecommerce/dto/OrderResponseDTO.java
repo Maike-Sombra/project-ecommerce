@@ -35,8 +35,7 @@ public record OrderResponseDTO(
                 order.getItems().stream()
                         .map(OrderItemResponseDTO::new)
                         .collect(Collectors.toSet()),
-                order.getItems().stream()
-                        .mapToDouble(item -> item.getPrice() * item.getQuantity()).sum()
+                order.getTotal()
         );
     }
 }

@@ -12,6 +12,8 @@ import com.umbrastack.ecommerce.repositories.ProductRepository;
 import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +28,8 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<ProductResponseDTO> findAll(){
-        return productRepository.findAll(Sort.by("id")).stream()
-                .map(ProductResponseDTO::new)
-                .toList();
+    public Page<ProductResponseDTO> findAll(Pageable pageable){
+        return productRepository.findAll(pageable).map(ProductResponseDTO::new);
     }
 
     @Transactional(readOnly = true)

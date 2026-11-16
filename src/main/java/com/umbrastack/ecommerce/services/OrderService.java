@@ -12,6 +12,8 @@ import com.umbrastack.ecommerce.repositories.ProductRepository;
 import com.umbrastack.ecommerce.repositories.UserRepository;
 import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +32,8 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
 
     @Transactional(readOnly = true)
-    public List<OrderResponseDTO> findAll(){
-        return orderRepository.findAll(Sort.by("id")).stream()
-                .map(OrderResponseDTO::new)
-                .toList();
+    public Page<OrderResponseDTO> findAll(Pageable pageable){
+        return orderRepository.findAll(pageable).map(OrderResponseDTO::new);
     }
 
     @Transactional(readOnly = true)

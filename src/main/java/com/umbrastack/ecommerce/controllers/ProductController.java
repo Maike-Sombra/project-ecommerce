@@ -7,6 +7,10 @@ import com.umbrastack.ecommerce.dto.ProductResponseDTO;
 import com.umbrastack.ecommerce.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,8 +26,11 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> findAll(){
-        return ResponseEntity.ok(productService.findAll());
+    public ResponseEntity<Page<ProductResponseDTO>> findAll(
+            @PageableDefault(page = 0, size = 12, sort = {"name", "id"}, direction = Sort.Direction.ASC)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(productService.findAll(pageable));
     }
 
     @GetMapping(value = "/{id}")

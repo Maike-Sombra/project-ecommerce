@@ -12,6 +12,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +26,12 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<UserResponseDTO> findAll(){
-        List<User> users = userRepository.findAll(Sort.by("id"));
-        return users.stream()
-                .map(UserResponseDTO::new)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Page<UserResponseDTO> findAll(Pageable pageable){
+        return userRepository.findAll(pageable).map(UserResponseDTO::new);
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO findById(Long id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));

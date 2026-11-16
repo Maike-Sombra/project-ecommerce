@@ -5,6 +5,10 @@ import com.umbrastack.ecommerce.dto.OrderResponseDTO;
 import com.umbrastack.ecommerce.services.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,8 +24,11 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> findAll(){
-        return ResponseEntity.ok(orderService.findAll());
+    public ResponseEntity<Page<OrderResponseDTO>> findAll(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(orderService.findAll(pageable));
     }
 
     @GetMapping(value = "/{id}")

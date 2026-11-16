@@ -7,6 +7,10 @@ import com.umbrastack.ecommerce.dto.UserUpdateDTO;
 import com.umbrastack.ecommerce.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,9 +25,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll(){
-        List<UserResponseDTO> list = userService.findAll();
-        return ResponseEntity.ok().body(list);
+    public ResponseEntity<Page<UserResponseDTO>> findAll(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(userService.findAll(pageable));
     }
 
     @GetMapping(value = "/{id}")

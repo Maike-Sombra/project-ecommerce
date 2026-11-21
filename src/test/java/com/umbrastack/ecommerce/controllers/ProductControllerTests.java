@@ -1,21 +1,28 @@
 package com.umbrastack.ecommerce.controllers;
 
 
+import com.umbrastack.ecommerce.config.SecurityConfigurations;
+import com.umbrastack.ecommerce.config.SecurityFilter;
 import com.umbrastack.ecommerce.domain.Category;
 import com.umbrastack.ecommerce.domain.Product;
 import com.umbrastack.ecommerce.dto.ProductRequestDTO;
 import com.umbrastack.ecommerce.dto.ProductResponseDTO;
+import com.umbrastack.ecommerce.repositories.UserRepository;
 import com.umbrastack.ecommerce.services.ProductService;
+import com.umbrastack.ecommerce.services.TokenService;
 import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
+@Import({SecurityConfigurations.class, SecurityFilter.class})
+@ActiveProfiles("test")
 class ProductControllerTests {
 
     @Autowired
@@ -34,6 +43,12 @@ class ProductControllerTests {
 
     @MockitoBean
     private ProductService productService;
+
+    @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     private ProductResponseDTO productResponseDTO;
 
@@ -83,6 +98,7 @@ class ProductControllerTests {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("POST /products deve retornar 201 Created e header Location quando payload for válido")
     void insertShouldReturn201CreatedWithLocationHeader() throws Exception {
         when(productService.insert(any(ProductRequestDTO.class))).thenReturn(productResponseDTO);
@@ -107,6 +123,29 @@ class ProductControllerTests {
     }
 
     @Test
+    @WithMockUser(roles = "CLIENT")
+    @DisplayName("POST /products deve retornar 403 Forbidden quando usuário não for ADMIN")
+    void insertShouldReturn403ForbiddenWhenUserIsNotAdmin() throws Exception {
+        String validJson = """
+                {
+                  "name": "Monitor 4K",
+                  "description": "Monitor IPS 27 polegadas",
+                  "price": 1800.0,
+                  "imgUrl": "",
+                  "categoryIds": [1]
+                }
+                """;
+
+        mockMvc.perform(post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validJson))
+                .andExpect(status().isForbidden());
+
+        verify(productService, never()).insert(any());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("POST /products deve retornar 422 Unprocessable Entity com mapa de erros quando validação falhar")
     void insertShouldReturn422ProblemDetailWhenValidationFails() throws Exception {
         String invalidJson = """
@@ -130,6 +169,7 @@ class ProductControllerTests {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("DELETE /products/{id} deve retornar 204 No Content quando exclusão for bem-sucedida")
     void deleteShouldReturn204WhenIdExistsAndHasNoDependencies() throws Exception {
         doNothing().when(productService).delete(1L);
@@ -139,6 +179,7 @@ class ProductControllerTests {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("DELETE /products/{id} deve retornar 409 Conflict no padrão RFC 7807 quando houver violação de integridade")
     void deleteShouldReturn409ProblemDetailWhenIntegrityViolationOccurs() throws Exception {
         doThrow(DataIntegrityViolationException.class).when(productService).delete(eq(1L));

@@ -1,6 +1,8 @@
 spring:
   application:
     name: ecommerce
+  config:
+    import: optional:file:.env[.properties]
   profiles:
     active: dev
   datasource:
@@ -14,3 +16,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}

@@ -8,3 +8,7 @@ spring:
   h2:
     console:
       enabled: true
+api:
+  security:
+    token:
+      secret: test-dummy-secret-key-for-junit-only #chave fictícia

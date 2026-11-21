@@ -2,11 +2,13 @@ package com.umbrastack.ecommerce.config;
 
 import com.umbrastack.ecommerce.domain.*;
 import com.umbrastack.ecommerce.domain.enums.OrderStatus;
+import com.umbrastack.ecommerce.domain.enums.UserRole;
 import com.umbrastack.ecommerce.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -21,6 +23,7 @@ public class TestConfig implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception{
@@ -29,9 +32,9 @@ public class TestConfig implements CommandLineRunner {
             return;
         }
 
-        Category cat1 = new Category(null, "Electronics",null);
-        Category cat2 = new Category(null, "Books", null);
-        Category cat3 = new Category(null, "Computers", null);
+        Category cat1 = new Category(null, "Electronics");
+        Category cat2 = new Category(null, "Books");
+        Category cat3 = new Category(null, "Computers");
 
 
         Product p1 = new Product(null, "The Lord of the Rings", "Lorem ipsum dolor sit amet, consectetur.", 90.5, "");
@@ -41,7 +44,6 @@ public class TestConfig implements CommandLineRunner {
         Product p5 = new Product(null, "Rails for Dummies", "Cras fringilla convallis sem vel faucibus.", 100.99, "");
 
         categoryRepository.saveAll(Arrays.asList(cat1,cat2,cat3));
-        productRepository.saveAll(Arrays.asList(p1,p2,p3,p4,p5));
 
         p1.getCategories().add(cat2); // Senhor dos anéis -> Books
         p2.getCategories().add(cat1); // Smart TV -> Electronics
@@ -52,9 +54,20 @@ public class TestConfig implements CommandLineRunner {
 
         productRepository.saveAll(Arrays.asList(p1,p2,p3,p4,p5));
 
-        User u1 = new User(null, "Maria Brown", "maria@gmail.com", "988888888", "123456");
-        User u2 = new User(null, "Alex Green", "alex@gmail.com", "977777777", "123456");
-        userRepository.saveAll(Arrays.asList(u1, u2));
+        User u1 = new User(null, "Maria Brown", "maria@gmail.com", "988888888", passwordEncoder.encode("123456"));
+        User u2 = new User(null, "Alex Green", "alex@gmail.com", "977777777", passwordEncoder.encode("123456"));
+        User admin = new User(
+                null,
+                "Admin UmbraStack",
+                "admin@umbrastack.com",
+                "999999999",
+                passwordEncoder.encode("123456"),
+                UserRole.ADMIN
+        );
+        userRepository.saveAll(Arrays.asList(u1, u2, admin));
+
+
+
 
         Order o1 = new Order(null, Instant.parse("2026-10-15T10:53:07Z"), OrderStatus.PAID, u1);
         Order o2 = new Order(null, Instant.parse("2026-10-15T15:42:10Z"), OrderStatus.WAITING_PAYMENT, u2);

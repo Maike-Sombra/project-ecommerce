@@ -7,6 +7,7 @@ import com.umbrastack.ecommerce.dto.CategoryResponseDTO;
 import com.umbrastack.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,7 +28,7 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<Page<CategoryResponseDTO>> findAll(
-            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC)
+            @ParameterObject @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable
     ){
         return ResponseEntity.ok(categoryService.findAll(pageable));

@@ -22,4 +22,10 @@ public class Category implements Serializable {
 
     @ManyToMany(mappedBy = "categories")
     private Set<Product> products = new HashSet<>();
+
+    public Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
 }

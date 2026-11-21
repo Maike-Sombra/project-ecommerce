@@ -3,8 +3,10 @@ package com.umbrastack.ecommerce.controllers.exceptions;
 import com.umbrastack.ecommerce.services.exceptions.DatabaseException;
 import com.umbrastack.ecommerce.services.exceptions.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -88,6 +90,37 @@ public class ResourceExceptionHandler {
 
         return problemDetail;
     }
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException e, WebRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED; // 401
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                status,
+                "Credenciais inválidas. Verifique seu e-mail e senha."
+        );
+        problemDetail.setTitle("Authentication Error");
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ProblemDetail handlePropertyReference(PropertyReferenceException e, WebRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST; // 400 Bad Request
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                status,
+                "Parâmetro de ordenação inválido: '" + e.getPropertyName() + "'."
+        );
+
+        problemDetail.setTitle("Invalid Sort Parameter");
+        problemDetail.setType(URI.create("https://umbrastack.com"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+
+        return problemDetail;
+    }
+
 
 
 }
